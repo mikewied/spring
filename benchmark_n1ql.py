@@ -4,7 +4,7 @@ import cProfile
 import pstats
 import StringIO
 from multiprocessing import Value, Lock
-from spring.wgen import AsyncKVWorker, N1QLWorker
+from spring.wgen import AsyncKVWorker, N1QLWorker, WorkloadGen
 
 
 workload_settings = type(
@@ -17,7 +17,7 @@ workload_settings = type(
                          'deletes': 0,
                          'cases': 0,
 
-                         'ops': 100,
+                         'ops': 8000,
                          'throughput': float('inf'),
 
                          'size': 2048,
@@ -30,8 +30,9 @@ workload_settings = type(
                          'query_workers': 0,
                          'dcp_workers': 0,
 
-                         'n1ql_workers': 1,
-                         'n1ql_throughput': 10,
+                         'n1ql': None,
+                         'n1ql_workers': 8,
+                         'n1ql_throughput': 800,
                          'n1ql_queries': ['SELECT * FROM `{bucket}` USE KEYS(\"{key}\")']
                          }
                          )()
@@ -40,26 +41,22 @@ target_settings = type(
                        'TargetSettings',
                        (object, ),
                        {
-                       'node': '127.0.0.1:8091',
-                       'bucket': 'default',
-                       'password': '',
+                       'node': '172.23.121.113:8091',
+                       'bucket': 'bucket-1',
+                       'password': 'password',
                        'prefix': None,
                        }
                        )
 
 
 def run():
-    curr_queries = Value('L', 0)
     curr_items = Value('i', workload_settings.items)
     deleted_items = Value('i', 0)
     lock = Lock()
 
-    worker = N1QLWorker(workload_settings, target_settings, None)
-    worker.run(sid=0,
-               lock=lock,
-               curr_queries=curr_queries,
-               curr_items=curr_items,
-               deleted_items=deleted_items)
+    workload = WorkloadGen(workload_settings, target_settings)
+    workload.start_n1ql_workers(curr_items, deleted_items)
+    workload.run()
 
 def profile():
     pr = cProfile.Profile()
