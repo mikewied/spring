@@ -33,7 +33,7 @@ class Worker(object):
 
     CORRECTION_FACTOR = 0.975  # empiric!
 
-    BATCH_SIZE = 100
+    BATCH_SIZE = 10
 
     def __init__(self, workload_settings, target_settings, shutdown_event=None):
         self.ws = workload_settings
