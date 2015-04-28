@@ -169,7 +169,9 @@ class N1QLGen(CBGen):
         try:
             nodes = self.session.get(self.query_url).json()
             for node in nodes['nodes']:
+                print node['hostname'], node['services']
                 if 'n1ql' in node['services']:
+                    print "Found ", node['hostname']
                     new_nodes.append(node['hostname'])
         except Exception as e:
             logger.warn('Failed to get list of servers: {}'.format(e))

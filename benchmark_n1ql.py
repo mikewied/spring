@@ -25,15 +25,16 @@ workload_settings = type(
                          'expiration': 0,
                          'working_set': 100,
                          'working_set_access': 100,
+                         'doc_gen': 'new',
 
                          'workers': 0,
                          'query_workers': 0,
                          'dcp_workers': 0,
 
                          'n1ql': None,
-                         'n1ql_workers': 8,
+                         'n1ql_workers': 32,
                          'n1ql_throughput': 800,
-                         'n1ql_queries': ['SELECT * FROM `{bucket}` USE KEYS(\"{key}\")']
+                         'n1ql_queries': ['SELECT * FROM `{bucket}` USE KEYS("{key}");']
                          }
                          )()
 
@@ -41,9 +42,9 @@ target_settings = type(
                        'TargetSettings',
                        (object, ),
                        {
-                       'node': '172.23.121.113:8091',
+                       'node': '172.23.100.70:8091',
                        'bucket': 'bucket-1',
-                       'password': 'password',
+                       'password': '',
                        'prefix': None,
                        }
                        )
